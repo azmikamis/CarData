@@ -71,6 +71,9 @@
     <Compile Include="Helpers\WebBrowserHelper.cs" />
     <Compile Include="Models\Car.cs" />
     <Compile Include="Models\CarModel.cs" />
+    <Compile Include="Scrapers\ManheimSearchResultScraper.cs" />
+    <Compile Include="Scrapers\CarGuruSearchResultScraper.cs" />
+    <Compile Include="Scrapers\OveSearchResultScraper.cs" />
     <Compile Include="ViewModels\MainWindowViewModel.cs" />
     <Compile Include="Views\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
