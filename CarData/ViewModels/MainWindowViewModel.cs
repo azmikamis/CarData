@@ -21,32 +21,17 @@ namespace CarData.ViewModels
         public string Source
         {
             get { return source; }
-            set
-            {
-                if (source != value)
-                {
-                    source = value;
-                }
-            }
+            set { if (source != value) source = value; }
         }
 
-        public ICommand GoToCommand
-        {
-            get;
-            set;
-        }
+        public ICommand GoToCommand { get; set; }
+        public ICommand GetManheimCarsCommand { get; set; }
+        public ICommand GetOveCarsCommand { get; set; }
+        public ICommand ScrapeAutotraderCommand { get; set; }
+        public ICommand ScrapeCarguruCommand { get; set; }
 
-        public ICommand GetCarsCommand
-        {
-            get;
-            set;
-        }
+        public ObservableCollection<CarModel> Cars { get; set; }
 
-        public ObservableCollection<CarModel> Cars 
-        { 
-            get;
-            set; 
-        }
         public MainWindowViewModel(WebBrowser mainBrowser)
         {
             this.mainBrowser = mainBrowser;
@@ -54,7 +39,10 @@ namespace CarData.ViewModels
             this.Cars = new ObservableCollection<CarModel>();
 
             this.GoToCommand = new GoToCommand(this);
-            this.GetCarsCommand = new GetCarsCommand(this);
+            this.GetManheimCarsCommand = new GetManheimCarsCommand(this);
+            this.GetOveCarsCommand = new GetOveCarsCommand(this);
+            this.ScrapeAutotraderCommand = new ScrapeAutotraderCommand(this);
+            this.ScrapeCarguruCommand = new ScrapeCarguruCommand(this);
         }
 
         public void GoTo()
@@ -62,7 +50,7 @@ namespace CarData.ViewModels
             this.mainBrowser.Navigate(Source);
         }
 
-        public void GetCars()
+        public void GetManheimCars()
         {
             mshtml.IHTMLDocument3 doc3 = (mshtml.IHTMLDocument3)this.mainBrowser.Document;
             string html = doc3.documentElement.outerHTML;
@@ -70,10 +58,26 @@ namespace CarData.ViewModels
             ManheimSearchResultScraper manheimSearchResultScraper = new ManheimSearchResultScraper(html);
             foreach (var car in manheimSearchResultScraper.GetCars())
                 this.Cars.Add(car);
+        }
+
+        public void GetOveCars()
+        {
+            mshtml.IHTMLDocument3 doc3 = (mshtml.IHTMLDocument3)this.mainBrowser.Document;
+            string html = doc3.documentElement.outerHTML;
 
             OveSearchResultScraper oveSearchResultScraper = new OveSearchResultScraper(html);
             foreach (var car in oveSearchResultScraper.GetCars())
                 this.Cars.Add(car);
+        }
+
+        public void ScrapeAutotrader()
+        {
+
+        }
+
+        public void ScrapeCarguru()
+        {
+
         }
     }
 }

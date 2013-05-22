@@ -20,20 +20,28 @@ namespace CarData.Scrapers
         {
             IList<CarModel> cars = new List<CarModel>();
 
-            foreach (var carNode in doc.DocumentNode.SelectNodes("//tr[@class='search_vehicle_row']"))
+            var carNodes = doc.DocumentNode.SelectNodes("//tr[@class='search_vehicle_row']");
+
+            if (carNodes != null)
             {
-                CarModel car = new CarModel();
+                foreach (var carNode in carNodes)
+                {
+                    CarModel car = new CarModel();
 
-                car.Year = ScrapeYear(carNode);
-                car.MakeModel = ScrapeMakeModel(carNode);
-                car.Odometer = ScrapeOdometer(carNode);
-                car.Color1 = ScrapeColor1(carNode);
-                car.Color2 = ScrapeColor2(carNode);
-                car.Vin = ScrapeVin(carNode);
-                car.Bin = ScrapeBin(carNode);
-                car.Bid = ScrapeBid(carNode);
+                    car.Lane = "";
+                    car.Run = "";
+                    car.Year = ScrapeYear(carNode);
+                    car.MakeModel = ScrapeMakeModel(carNode);
+                    car.EngineTransmission = "";
+                    car.Odometer = ScrapeOdometer(carNode);
+                    car.Color1 = ScrapeColor1(carNode);
+                    car.Color2 = ScrapeColor2(carNode);
+                    car.Vin = ScrapeVin(carNode);
+                    car.Bin = ScrapeBin(carNode);
+                    car.Bid = ScrapeBid(carNode);
 
-                cars.Add(car);
+                    cars.Add(car);
+                }
             }
 
             return cars;

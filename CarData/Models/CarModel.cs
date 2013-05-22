@@ -17,8 +17,11 @@ namespace CarData.Models
         {
             set
             {
+                this.Lane = value.Lane;
+                this.Run = value.Run;
                 this.Year = value.Year;
                 this.MakeModel = value.MakeModel;
+                this.EngineTransmission = value.EngineTransmission;
                 this.Odometer = value.Odometer;
                 this.Color1 = value.Color1;
                 this.Color2 = value.Color2;
@@ -26,12 +29,30 @@ namespace CarData.Models
                 this.Bin = value.Bin;
                 this.Bid = value.Bid;
                 this.AutoTraderPrice = value.AutoTraderPrice;
-                this.NumberOfVehicles = value.NumberOfVehicles;
+                this.AutoTraderNumberOfVehicles = value.AutoTraderNumberOfVehicles;
                 this.TopThree = value.TopThree;
                 this.Profit = value.Profit;
             }
 
         }
+
+        public string Lane
+        {
+            get { return (string)GetValue(LaneProperty); }
+            set { SetValue(LaneProperty, value); }
+        }
+
+        public static readonly DependencyProperty LaneProperty =
+            DependencyProperty.Register("Lane", typeof(string), typeof(CarModel), new UIPropertyMetadata(""));
+
+        public string Run
+        {
+            get { return (string)GetValue(RunProperty); }
+            set { SetValue(RunProperty, value); }
+        }
+
+        public static readonly DependencyProperty RunProperty =
+            DependencyProperty.Register("Run", typeof(string), typeof(CarModel), new UIPropertyMetadata(""));
 
         public string Year
         {
@@ -50,6 +71,15 @@ namespace CarData.Models
 
         public static readonly DependencyProperty MakeModelProperty =
             DependencyProperty.Register("MakeModel", typeof(string), typeof(CarModel), new UIPropertyMetadata(""));
+
+        public string EngineTransmission
+        {
+            get { return (string)GetValue(EngineTransmissionProperty); }
+            set { SetValue(EngineTransmissionProperty, value); }
+        }
+
+        public static readonly DependencyProperty EngineTransmissionProperty =
+            DependencyProperty.Register("EngineTransmission", typeof(string), typeof(CarModel), new UIPropertyMetadata(""));
 
         public string Odometer
         {
@@ -114,14 +144,14 @@ namespace CarData.Models
         public static readonly DependencyProperty AutoTraderPriceProperty =
             DependencyProperty.Register("AutoTraderPrice", typeof(string), typeof(CarModel), new UIPropertyMetadata(""));
 
-        public string NumberOfVehicles
+        public string AutoTraderNumberOfVehicles
         {
-            get { return (string)GetValue(NumberOfVehiclesProperty); }
-            set { SetValue(NumberOfVehiclesProperty, value); }
+            get { return (string)GetValue(AutoTraderNumberOfVehiclesProperty); }
+            set { SetValue(AutoTraderNumberOfVehiclesProperty, value); }
         }
 
-        public static readonly DependencyProperty NumberOfVehiclesProperty =
-            DependencyProperty.Register("NumberOfVehicles", typeof(string), typeof(CarModel), new UIPropertyMetadata(""));
+        public static readonly DependencyProperty AutoTraderNumberOfVehiclesProperty =
+            DependencyProperty.Register("AutoTraderNumberOfVehicles", typeof(string), typeof(CarModel), new UIPropertyMetadata(""));
 
         public string TopThree
         {
@@ -140,5 +170,24 @@ namespace CarData.Models
 
         public static readonly DependencyProperty ProfitProperty =
             DependencyProperty.Register("Profit", typeof(string), typeof(CarModel), new UIPropertyMetadata(""));
+
+        public string CarGuruPrice
+        {
+            get { return (string)GetValue(CarGuruPriceProperty); }
+            set { SetValue(CarGuruPriceProperty, value); }
+        }
+
+        public static readonly DependencyProperty CarGuruPriceProperty =
+            DependencyProperty.Register("CarGuruPrice", typeof(string), typeof(CarModel), new UIPropertyMetadata(""));
+
+        public string CarGuruNumberOfVehicles
+        {
+            get { return (string)GetValue(CarGuruNumberOfVehiclesProperty); }
+            set { SetValue(CarGuruNumberOfVehiclesProperty, value); }
+        }
+
+        public static readonly DependencyProperty CarGuruNumberOfVehiclesProperty =
+            DependencyProperty.Register("CarGuruNumberOfVehicles", typeof(string), typeof(CarModel), new UIPropertyMetadata(""));
+
     }
 }

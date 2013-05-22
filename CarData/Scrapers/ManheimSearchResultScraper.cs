@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
+using System.Text.RegularExpressions;
 using CarData.Models;
 using HtmlAgilityPack;
 namespace CarData.Scrapers
@@ -32,30 +33,28 @@ namespace CarData.Scrapers
                     {
                         if (line.Contains("pre_inv_ps-vdp"))
                         {
-                            string[] separator = new string[] { ">" };
-                            string[] whiteSpaceDelimiter = new string[] { " " };
-                            string[] array3 = line.Trim().Split(separator, StringSplitOptions.RemoveEmptyEntries);
-                            int num = array3.Length;
-                            if (num == 3)
-                            {
-                                string[] array4 = array3[0].Trim().Split(whiteSpaceDelimiter, StringSplitOptions.RemoveEmptyEntries);
-                                string text2 = array4[0];
-                                string text3 = array4[1];
-                                string text4 = array4[2];
-                                string text5 = WebUtility.HtmlDecode(array3[1].Substring(0, array3[1].Length - 3));
-                                string[] array5 = array3[2].Trim().Split(whiteSpaceDelimiter, StringSplitOptions.RemoveEmptyEntries);
-                                string text6 = array5[0];
-                                string text7 = array5[1];
-                                string text8 = array5[2];
-                                string text9 = array5[array5.Length - 3];
-                                for (int j = 3; j < array5.Length; j++)
-                                {
-                                    if (array5[j].Length > 12)
-                                    {
-                                        text9 = array5[j];
-                                    }
-                                }
-                            }
+                            CarModel car = new CarModel();
+                            
+                            Match match = Regex.Match(line, @"<a.*?>(.*?)</a>", RegexOptions.IgnoreCase);
+                            string matchValue = match.Value;
+                            string makeModel = Regex.Replace(matchValue, @"</?a.*?>", "");
+                            line = line.Replace(matchValue, "");
+
+                            string[] carPropertyArray = line.Trim().Split(new string[] { " " }, StringSplitOptions.RemoveEmptyEntries);
+
+                            car.Lane = carPropertyArray[0];
+                            car.Run = carPropertyArray[1];
+                            car.Year = carPropertyArray[2];
+                            car.MakeModel = makeModel;
+                            car.EngineTransmission = carPropertyArray[3];
+                            car.Odometer = carPropertyArray[4];
+                            car.Color1 = carPropertyArray[5];
+                            car.Color2 = "";
+                            car.Vin = carPropertyArray[6];
+                            car.Bin = "";
+                            car.Bid = "";
+
+                            cars.Add(car);
                         }
                     }
 

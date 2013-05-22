@@ -7,8 +7,11 @@ namespace CarData.Models
 {
     public class Car
     {
+        public string Lane { get; set; }
+        public string Run { get; set; }
         public string Year { get; set; }
         public string MakeModel { get; set; }
+        public string EngineTransmission { get; set; }
         public string Odometer { get; set; }
         public string Color1 { get; set; }
         public string Color2 { get; set; }
@@ -16,8 +19,10 @@ namespace CarData.Models
         public string Bin { get; set; }
         public string Bid { get; set; }
         public string AutoTraderPrice { get; set; }
-        public string NumberOfVehicles { get; set; }
+        public string AutoTraderNumberOfVehicles { get; set; }
         public string TopThree { get; set; }
         public string Profit { get; set; }
+        public string CarGuruPrice { get; set; }
+        public string CarGuruNumberOfVehicles { get; set; }
     }
 }

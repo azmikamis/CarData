@@ -66,7 +66,10 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Commands\GetCarsCommand.cs" />
+    <Compile Include="Commands\GetOveCarsCommand.cs" />
+    <Compile Include="Commands\ScrapeCarguruCommand.cs" />
+    <Compile Include="Commands\ScrapeAutotraderCommand.cs" />
+    <Compile Include="Commands\GetManheimCarsCommand.cs" />
     <Compile Include="Commands\GoToCommand.cs" />
     <Compile Include="Helpers\WebBrowserHelper.cs" />
     <Compile Include="Models\Car.cs" />

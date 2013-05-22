@@ -7,11 +7,11 @@ using CarData.ViewModels;
 
 namespace CarData.Commands
 {
-    public class GetCarsCommand : ICommand
+    public class ScrapeAutotraderCommand : ICommand
     {
         private readonly MainWindowViewModel mainWindowViewModel;
 
-        public GetCarsCommand(MainWindowViewModel mainWindowViewModel)
+        public ScrapeAutotraderCommand(MainWindowViewModel mainWindowViewModel)
         {
             this.mainWindowViewModel = mainWindowViewModel;
         }
@@ -25,7 +25,7 @@ namespace CarData.Commands
 
         public void Execute(object paramter)
         {
-            mainWindowViewModel.GetCars();
+            mainWindowViewModel.ScrapeAutotrader();
         }
     }
 }
