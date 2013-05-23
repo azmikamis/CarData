@@ -32,6 +32,7 @@ namespace CarData.Models
                 this.AutoTraderNumberOfVehicles = value.AutoTraderNumberOfVehicles;
                 this.TopThree = value.TopThree;
                 this.Profit = value.Profit;
+                this.DecodeThisYearMakeModel = value.DecodeThisYearMakeModel;
             }
 
         }
@@ -189,5 +190,13 @@ namespace CarData.Models
         public static readonly DependencyProperty CarGuruNumberOfVehiclesProperty =
             DependencyProperty.Register("CarGuruNumberOfVehicles", typeof(string), typeof(CarModel), new UIPropertyMetadata(""));
 
+        public string DecodeThisYearMakeModel
+        {
+            get { return (string)GetValue(DecodeThisYearMakeModelProperty); }
+            set { SetValue(DecodeThisYearMakeModelProperty, value); }
+        }
+
+        public static readonly DependencyProperty DecodeThisYearMakeModelProperty =
+            DependencyProperty.Register("DecodeThisYearMakeModel", typeof(string), typeof(CarModel), new UIPropertyMetadata(""));
     }
 }

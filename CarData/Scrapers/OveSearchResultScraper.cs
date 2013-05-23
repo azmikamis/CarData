@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using CarData.Models;
 using HtmlAgilityPack;
 namespace CarData.Scrapers
@@ -20,7 +21,7 @@ namespace CarData.Scrapers
         {
             IList<CarModel> cars = new List<CarModel>();
 
-            var carNodes = doc.DocumentNode.SelectNodes("//tr[@class='search_vehicle_row']");
+            var carNodes = doc.DocumentNode.SelectNodes("//tr[@class='search_vehicle_basic_row search_name_cell']");
 
             if (carNodes != null)
             {
@@ -37,8 +38,12 @@ namespace CarData.Scrapers
                     car.Color1 = ScrapeColor1(carNode);
                     car.Color2 = ScrapeColor2(carNode);
                     car.Vin = ScrapeVin(carNode);
-                    car.Bin = ScrapeBin(carNode);
-                    car.Bid = ScrapeBid(carNode);
+                    car.Bin = "";// ScrapeBin(carNode);
+                    car.Bid = "";// ScrapeBid(carNode);
+
+                    DecodeThisScraper decodeThisScraper = new DecodeThisScraper();
+                    DecodeThisResult decodeThisResult = decodeThisScraper.GetResult(car.Vin);
+                    car.DecodeThisYearMakeModel = decodeThisResult.YearMakeModel;
 
                     cars.Add(car);
                 }
@@ -49,38 +54,40 @@ namespace CarData.Scrapers
 
         private string ScrapeYear(HtmlNode node)
         {
-            HtmlNode yearMakeModelNode = node.SelectSingleNode("td/table[@class='search_name_cell']/tbody/tr[1]/td/a");
+            HtmlNode yearMakeModelNode = node.SelectSingleNode("td[1]/a");
             return yearMakeModelNode.InnerHtml.Split(new char[] { ' ' }, 2)[0];
         }
 
         private string ScrapeMakeModel(HtmlNode node)
         {
-            HtmlNode yearMakeModelNode = node.SelectSingleNode("td/table[@class='search_name_cell']/tbody/tr[1]/td/a");
+            HtmlNode yearMakeModelNode = node.SelectSingleNode("td[1]/a");
             return yearMakeModelNode.InnerHtml.Split(new char[] { ' ' }, 2)[1];
         }
 
         private string ScrapeOdometer(HtmlNode node)
         {
-            HtmlNode odometerNode = node.SelectSingleNode("td/table[@class='search_name_cell']/tbody/tr[3]/td/text()");
-            return odometerNode.InnerHtml.Replace("&nbsp;", "");
+            HtmlNode odometerNode = node.SelectSingleNode("td[3]");
+            return odometerNode.InnerHtml.Split(new string[] { "<br>" }, StringSplitOptions.RemoveEmptyEntries)[1];
         }
 
         private string ScrapeColor1(HtmlNode node)
         {
-            HtmlNode color1Node = node.SelectSingleNode("td[@class='search_thumb_cell']/table/tbody/tr[2]/td[1]");
-            return color1Node.InnerHtml;
+            HtmlNode colorNode = node.SelectSingleNode("td[2]");
+            return colorNode.InnerHtml.Split(new string[] { "<br>" }, StringSplitOptions.None)[0];
         }
 
         private string ScrapeColor2(HtmlNode node)
         {
-            HtmlNode color2Node = node.SelectSingleNode("td[@class='search_thumb_cell']/table/tbody/tr[2]/td[3]");
-            return color2Node.InnerHtml;
+            HtmlNode colorNode = node.SelectSingleNode("td[2]");
+            return colorNode.InnerHtml.Split(new string[] { "<br>" }, StringSplitOptions.None)[1];
         }
 
         private string ScrapeVin(HtmlNode node)
         {
-            HtmlNode vinNode = node.SelectSingleNode("td/table[@class='search_name_cell']/tbody/tr[2]/td");
-            return vinNode.InnerHtml;
+            HtmlNode vinNode = node.SelectSingleNode("td[1]");
+            Regex pattern = new Regex(@"<a.*?>(.*?)</a><br>(?<vin>.*)");
+            Match match = pattern.Match(vinNode.InnerHtml);
+            return match.Groups["vin"].Value.Trim();
         }
 
         private string ScrapeBin(HtmlNode node)

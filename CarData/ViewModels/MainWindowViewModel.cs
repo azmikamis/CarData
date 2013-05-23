@@ -77,7 +77,13 @@ namespace CarData.ViewModels
 
         public void ScrapeCarguru()
         {
-
+            foreach (var car in Cars)
+            {
+                CarGuruScraper scraper = new CarGuruScraper();
+                CarGuruResult result = scraper.GetResult(car.Vin);
+                car.CarGuruPrice = result.InstantMarketValue;
+                car.CarGuruNumberOfVehicles = result.NumberOfListings;
+            }
         }
     }
 }

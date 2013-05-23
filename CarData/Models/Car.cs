@@ -24,5 +24,6 @@ namespace CarData.Models
         public string Profit { get; set; }
         public string CarGuruPrice { get; set; }
         public string CarGuruNumberOfVehicles { get; set; }
+        public string DecodeThisYearMakeModel { get; set; }
     }
 }

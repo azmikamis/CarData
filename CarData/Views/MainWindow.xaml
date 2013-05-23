@@ -46,6 +46,7 @@
                         <GridViewColumn Header="Profit" DisplayMemberBinding="{Binding Path=Profit}" Width="80" />
                         <GridViewColumn Header="CarGuru Price" DisplayMemberBinding="{Binding Path=CarGuruPrice}" Width="80" />
                         <GridViewColumn Header="CarGuru # of Vehicles" DisplayMemberBinding="{Binding Path=CarGuruNumberOfVehicles}" Width="80" />
+                        <GridViewColumn Header="DecodeThis YearMakeModel" DisplayMemberBinding="{Binding Path=DecodeThisYearMakeModel}" Width="80" />
                     </GridView>
                 </ListView.View>
             </ListView>

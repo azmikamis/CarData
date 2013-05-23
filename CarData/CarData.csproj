@@ -73,9 +73,14 @@
     <Compile Include="Commands\GoToCommand.cs" />
     <Compile Include="Helpers\WebBrowserHelper.cs" />
     <Compile Include="Models\Car.cs" />
+    <Compile Include="Models\CarGuruResult.cs" />
     <Compile Include="Models\CarModel.cs" />
+    <Compile Include="Models\AutoTraderResult.cs" />
+    <Compile Include="Models\DecodeThisResult.cs" />
+    <Compile Include="Scrapers\AutoTraderScraper.cs" />
+    <Compile Include="Scrapers\DecodeThisScraper.cs" />
     <Compile Include="Scrapers\ManheimSearchResultScraper.cs" />
-    <Compile Include="Scrapers\CarGuruSearchResultScraper.cs" />
+    <Compile Include="Scrapers\CarGuruScraper.cs" />
     <Compile Include="Scrapers\OveSearchResultScraper.cs" />
     <Compile Include="ViewModels\MainWindowViewModel.cs" />
     <Compile Include="Views\MainWindow.xaml.cs">
