@@ -8,48 +8,46 @@ using CarData.Models;
 using HtmlAgilityPack;
 namespace CarData.Scrapers
 {
-    public class OveSearchResultScraper
+    public class OveSearchResult1Scraper
     {
+        public event Action<Dictionary<string, string>> CarInfoScraped;
+
         HtmlDocument doc = new HtmlDocument();
         
-        public OveSearchResultScraper(string html)
+        public OveSearchResult1Scraper(string html)
         {
             doc.LoadHtml(html);
         }
 
-        public IEnumerable<CarModel> GetCars()
+        public void GetCars()
         {
-            IList<CarModel> cars = new List<CarModel>();
-
             var carNodes = doc.DocumentNode.SelectNodes("//tr[@class='search_vehicle_basic_row search_name_cell']");
 
             if (carNodes != null)
             {
                 foreach (var carNode in carNodes)
                 {
-                    CarModel car = new CarModel();
+                    Dictionary<string, string> carProperties = new Dictionary<string, string>();
 
-                    car.Lane = "";
-                    car.Run = "";
-                    car.Year = ScrapeYear(carNode);
-                    car.MakeModel = ScrapeMakeModel(carNode);
-                    car.EngineTransmission = "";
-                    car.Odometer = ScrapeOdometer(carNode);
-                    car.Color1 = ScrapeColor1(carNode);
-                    car.Color2 = ScrapeColor2(carNode);
-                    car.Vin = ScrapeVin(carNode);
-                    car.Bin = "";// ScrapeBin(carNode);
-                    car.Bid = "";// ScrapeBid(carNode);
+                    carProperties.Add("Lane", "");
+                    carProperties.Add("Run", "");
+                    carProperties.Add("Year", ScrapeYear(carNode));
+                    carProperties.Add("MakeModel", ScrapeMakeModel(carNode));
+                    carProperties.Add("EngineTransmission", "");
+                    carProperties.Add("Odometer", ScrapeOdometer(carNode));
+                    carProperties.Add("Color1", ScrapeColor1(carNode));
+                    carProperties.Add("Color2", "");
+                    carProperties.Add("Vin", ScrapeVin(carNode));
+                    carProperties.Add("Bin", "");
+                    carProperties.Add("Bid", "");
 
                     DecodeThisScraper decodeThisScraper = new DecodeThisScraper();
-                    DecodeThisResult decodeThisResult = decodeThisScraper.GetResult(car.Vin);
-                    car.DecodeThisYearMakeModel = decodeThisResult.YearMakeModel;
+                    DecodeThisResult decodeThisResult = decodeThisScraper.GetResult(carProperties["Vin"]);
+                    carProperties.Add("DecodeThisYearMakeModel", decodeThisResult.YearMakeModel);
 
-                    cars.Add(car);
+                    CarInfoScraped(carProperties);
                 }
             }
-
-            return cars;
         }
 
         private string ScrapeYear(HtmlNode node)

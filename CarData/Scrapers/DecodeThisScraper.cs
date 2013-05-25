@@ -46,7 +46,14 @@ namespace CarData.Scrapers
             }
             else
             {
-                result.YearMakeModel = doc.DocumentNode.SelectSingleNode("//span[@id='dnn_ctr500_VehicleIdPrime_lblName']").InnerHtml;
+                try
+                {
+                    result.YearMakeModel = doc.DocumentNode.SelectSingleNode("//span[@id='dnn_ctr500_VehicleIdPrime_lblName']").InnerHtml;
+                }
+                catch
+                {
+                    result.YearMakeModel = "";
+                }
             }
 
             return result;

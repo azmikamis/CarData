@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -12,14 +13,20 @@ namespace CarData.Scrapers
 {
     public class CarGuruScraper
     {
+        public event Action<CarGuruResult> ResultScraped;
+
         HtmlDocument doc = new HtmlDocument();
 
-        public CarGuruScraper()
+        private int index;
+        private string vin;
+        
+        public CarGuruScraper(int index, string vin)
         {
-            
+            this.index = index;
+            this.vin = vin;
         }
 
-        public CarGuruResult GetResult(string vin)
+        public void GetResult()
         {
             if (HtmlNode.ElementsFlags.ContainsKey("option"))
             {
@@ -31,7 +38,7 @@ namespace CarData.Scrapers
             }
 
             HtmlWeb web = new HtmlWeb();
-            string mainDocUrl = String.Format("http://www.cargurus.com/Cars/instantMarketValueFromVIN.action?startUrl=%2Findex.html&carDescription.vin={0}", vin);
+            string mainDocUrl = String.Format("http://www.cargurus.com/Cars/instantMarketValueFromVIN.action?startUrl=%2Findex.html&carDescription.vin={0}", this.vin);
             HtmlDocument mainDoc = web.Load(mainDocUrl);
 
             var makerIdNode = mainDoc.DocumentNode.SelectSingleNode("//select[@name='ign-makerId-selectedEntity']/option[@selected='selected'][last()]");
@@ -40,7 +47,20 @@ namespace CarData.Scrapers
             var trimIdNode = mainDoc.DocumentNode.SelectSingleNode("//select[@name='ign-trimId-selectedEntity']/option[@selected='selected'][last()]");
 
             HtmlNode entityIdNode = trimIdNode ?? carIdNode ?? modelIdNode ?? makerIdNode;
-            var entityId = entityIdNode.Attributes["value"].Value;
+            HtmlAttribute entityIdValueAttribute = entityIdNode.Attributes["value"];
+
+            CarGuruResult result = new CarGuruResult();
+            result.Index = this.index;
+
+            if (entityIdValueAttribute == null)
+            {
+                result.InstantMarketValue = "";
+                result.NumberOfListings = "0";
+                ResultScraped(result);
+                return;
+            }
+
+            var entityId = entityIdValueAttribute.Value;
 
             var priceViewUrl = String.Format("http://www.cargurus.com/Cars/priceCalculatorReportAjaxResearchPriceView.action?carDescription.autoEntityId={0}", entityId);
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(priceViewUrl);
@@ -48,20 +68,33 @@ namespace CarData.Scrapers
             Stream receiveStream = response.GetResponseStream();
             StreamReader readStream = new StreamReader(receiveStream, Encoding.UTF8);
             string responseString = readStream.ReadToEnd();
-            
+
             HtmlDocument priceViewDoc = new HtmlDocument();
             priceViewDoc.LoadHtml(@"<html>" + responseString + "</html>");
 
-            CarGuruResult result = new CarGuruResult();
-            
-            result.InstantMarketValue = priceViewDoc.DocumentNode.SelectSingleNode("//span[@class='instantMarketValue']").InnerHtml;
-            
-            string numberOfListings = priceViewDoc.DocumentNode.SelectSingleNode("//span[@class='sectionExplanation']").InnerHtml;
-            Regex pattern = new Regex(@"^Based on\s*(?<numOfListings>.*)\s*listings");
-            Match match = pattern.Match(numberOfListings);
-            result.NumberOfListings = match.Groups["numOfListings"].Value.Trim();
+            try
+            {
+                string instantMarketvalue = priceViewDoc.DocumentNode.SelectSingleNode("//span[@class='instantMarketValue']").InnerHtml;
+                result.InstantMarketValue = double.Parse(instantMarketvalue, NumberStyles.Currency).ToString();
+            }
+            catch
+            {
+                result.InstantMarketValue = "";
+            }
 
-            return result;
+            try
+            {
+                string numberOfListings = priceViewDoc.DocumentNode.SelectSingleNode("//span[@class='sectionExplanation']").InnerHtml;
+                Regex pattern = new Regex(@"^Based on\s*(?<numOfListings>.*)\s*listings");
+                Match match = pattern.Match(numberOfListings);
+                result.NumberOfListings = match.Groups["numOfListings"].Value.Trim();
+            }
+            catch
+            {
+                result.NumberOfListings = "";
+            }
+
+            ResultScraped(result);
         }
     }
 }

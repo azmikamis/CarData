@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -12,14 +13,20 @@ namespace CarData.Scrapers
 {
     public class AutoTraderScraper
     {
+        public event Action<AutoTraderResult> ResultScraped;
+
         HtmlDocument doc = new HtmlDocument();
 
-        public AutoTraderScraper()
+        private int index;
+        private string yearMakeModel;
+
+        public AutoTraderScraper(int index, string yearMakeModel)
         {
-            
+            this.index = index;
+            this.yearMakeModel = yearMakeModel;
         }
 
-        public AutoTraderResult GetResult(string vin)
+        public void GetResult()
         {
             if (HtmlNode.ElementsFlags.ContainsKey("option"))
             {
@@ -31,37 +38,77 @@ namespace CarData.Scrapers
             }
 
             HtmlWeb web = new HtmlWeb();
-            string mainDocUrl = String.Format("http://www.cargurus.com/Cars/instantMarketValueFromVIN.action?startUrl=%2Findex.html&carDescription.vin={0}", vin);
-            HtmlDocument mainDoc = web.Load(mainDocUrl);
-
-            var makerIdNode = mainDoc.DocumentNode.SelectSingleNode("//select[@name='ign-makerId-selectedEntity']/option[@selected='selected'][last()]");
-            var modelIdNode = mainDoc.DocumentNode.SelectSingleNode("//select[@name='ign-modelId-selectedEntity']/option[@selected='selected'][last()]");
-            var carIdNode = mainDoc.DocumentNode.SelectSingleNode("//select[@name='ign-carId-selectedEntity']/option[@selected='selected'][last()]");
-            var trimIdNode = mainDoc.DocumentNode.SelectSingleNode("//select[@name='ign-trimId-selectedEntity']/option[@selected='selected'][last()]");
-
-            HtmlNode entityIdNode = trimIdNode ?? carIdNode ?? modelIdNode ?? makerIdNode;
-            var entityId = entityIdNode.Attributes["value"].Value;
-
-            var priceViewUrl = String.Format("http://www.cargurus.com/Cars/priceCalculatorReportAjaxResearchPriceView.action?carDescription.autoEntityId={0}", entityId);
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(priceViewUrl);
-            HttpWebResponse response = (HttpWebResponse)request.GetResponse();
-            Stream receiveStream = response.GetResponseStream();
-            StreamReader readStream = new StreamReader(receiveStream, Encoding.UTF8);
-            string responseString = readStream.ReadToEnd();
-            
-            HtmlDocument priceViewDoc = new HtmlDocument();
-            priceViewDoc.LoadHtml(@"<html>" + responseString + "</html>");
 
             AutoTraderResult result = new AutoTraderResult();
-            
-            result.InstantMarketValue = priceViewDoc.DocumentNode.SelectSingleNode("//span[@class='instantMarketValue']").InnerHtml;
-            
-            string numberOfListings = priceViewDoc.DocumentNode.SelectSingleNode("//span[@class='sectionExplanation']").InnerHtml;
-            Regex pattern = new Regex(@"^Based on\s*(?<numOfListings>.*)\s*listings");
-            Match match = pattern.Match(numberOfListings);
-            result.NumberOfListings = match.Groups["numOfListings"].Value.Trim();
+            result.Index = this.index;
 
-            return result;
+            if (yearMakeModel == "")
+            {
+                result.AveragePrice = 0;
+                result.NumberOfListings = "";
+
+                ResultScraped(result);
+                return;
+            }
+
+            string mainDocUrl = String.Format("http://www.autotrader.ca/a/pv/new-used/all/all/{0}/?prx=100&cty=TURKEY+POINT&prv=Ontario&r=40&loc=N0E1T0&cat1=2&cat2=7%2c11%2c10%2c9&st=1", yearMakeModel.Replace(" ", "%20"));
+            HtmlDocument mainDoc = web.Load(mainDocUrl);
+
+            List<AutoTraderCar> cars = new List<AutoTraderCar>();
+            HtmlNodeCollection priceKmNodes = mainDoc.DocumentNode.SelectNodes("//div[@class='at_priceKmArea at_marginB']");
+
+            if (priceKmNodes == null)
+            {
+                result.AveragePrice = 0;
+                result.NumberOfListings = "0";
+
+                ResultScraped(result);
+                return;
+            }
+
+            foreach (HtmlNode priceKmNode in priceKmNodes)
+            {
+                string priceInnerHtml = priceKmNode.SelectSingleNode("div[@class='at_price at_sprite']").InnerHtml.Trim();
+                double price = 0;
+                try
+                {
+                    price = double.Parse(priceInnerHtml, NumberStyles.Currency);
+                }
+                catch
+                {
+                    price = double.Parse(priceInnerHtml.Replace("$", "").Replace(",", ""));
+                }
+
+                string meter = "";
+                try
+                {
+                    meter = priceKmNode.SelectSingleNode("div[@class='at_km']").InnerHtml.Trim();
+                }
+                catch
+                {
+                    meter = "0";
+                }
+                cars.Add(new AutoTraderCar { Price = price, Km = meter });
+            }
+
+            if (cars.Count == 0)
+            {
+                result.AveragePrice = 0;
+                result.NumberOfListings = "0";
+
+                ResultScraped(result);
+                return;
+            }
+
+            double totalPrice = 0;
+            foreach (var autoTraderCar in cars)
+            {
+                totalPrice += autoTraderCar.Price;
+            }
+            result.AveragePrice = totalPrice / cars.Count;
+            result.NumberOfListings = "";
+
+            ResultScraped(result);
         }
     }
 }

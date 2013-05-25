@@ -7,11 +7,11 @@ using CarData.ViewModels;
 
 namespace CarData.Commands
 {
-    public class GetOveCarsCommand : ICommand
+    public class GoToManheimCommand : ICommand
     {
         private readonly MainWindowViewModel mainWindowViewModel;
 
-        public GetOveCarsCommand(MainWindowViewModel mainWindowViewModel)
+        public GoToManheimCommand(MainWindowViewModel mainWindowViewModel)
         {
             this.mainWindowViewModel = mainWindowViewModel;
         }
@@ -25,7 +25,7 @@ namespace CarData.Commands
 
         public void Execute(object paramter)
         {
-            mainWindowViewModel.GetOveCars();
+            mainWindowViewModel.GoToManheim();
         }
     }
 }

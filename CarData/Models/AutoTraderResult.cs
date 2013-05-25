@@ -7,7 +7,8 @@ namespace CarData.Models
 {
     public class AutoTraderResult
     {
-        public string InstantMarketValue { get; set; }
+        public int Index { get; set; }
+        public double AveragePrice { get; set; }
         public string NumberOfListings { get; set; }
     }
 }
